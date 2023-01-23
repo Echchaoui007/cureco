@@ -23,8 +23,11 @@ class Posts extends Controller
     {
         //get posts
         $posts = $this->postModel->getProducts();
+        $stats = $this->postModel->getStats();
+        
         $data = [
-            'allItems' => $posts
+            'allItems' => $posts,
+            'stats' => $stats
         ];
 
         // load view with data 
@@ -35,80 +38,44 @@ class Posts extends Controller
     {
         // Check for POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            for ($i = 0; $i < count($_POST['prod_name']); $i++) {
 
-            $img_name = $_FILES['img']['name'];
-            $img_tmp = $_FILES['img']['tmp_name'];
-            move_uploaded_file($img_tmp, 'img/upload/' . $img_name);
 
-            $img_name1 = $_FILES['img1']['name'];
-            $img_tmp1 = $_FILES['img1']['tmp_name'];
-            move_uploaded_file($img_tmp1, 'img/upload/' . $img_name1);
+                $img_name = $_FILES['img']['name'][$i];
+                $img_tmp = $_FILES['img']['tmp_name'][$i];
+                move_uploaded_file($img_tmp, 'img/upload/' . $img_name);
 
-            $data = [
-                'name_product' => trim($_POST['prod_name']),
-                'quantite_product' => trim($_POST['quantite']),
-                'price_product' =>  trim($_POST['price']),
-                'img_product' => $img_name,
-                'name_product_err' => '',
-                'quantite_product_err' => '',
-                'price_product_err' => '',
-                'img_product_err' => '',
-                'name_product1' => trim($_POST['prod_name1']),
-                'quantite_product1' => trim($_POST['quantite1']),
-                'price_product1' =>  trim($_POST['price1']),
-                'img_product1' => $img_name1,
-                'name_product_err' => '',
-                'quantite_product_err' => '',
-                'price_product_err' => '',
-                'img_product_err' => '',
-            ];
+            
 
-            // Validate data
-            if (empty($data['name_product'])) {
-                $data['name_product_err'] = 'Please enter Name';
-            }
-            if (empty($data['quantite_product'])) {
-                $data['quantite_product_err'] = 'Please enter Quantite';
-            }
-            if (empty($data['price_product'])) {
-                $data['price_product_err'] = 'Please enter Price';
-            }
-            if (empty($data['img_product'])) {
-                $data['img_product_err'] = 'Please enter Image';
-            }
-            //make sure no errors
-            if (empty($data['name_product_err']) && empty($data['quantite_product_err']) && empty($data['price_product_err']) && empty($data['img_product_err'])) {
-                if ($this->postModel->addProducts($data)) {
-                    redirect("posts/dashboard");
-                } else {
-                    //load the view with errors
-                    $this->view('posts/dashboard', $data);
-                }
-            } else {
                 $data = [
-                    'name_product' => '',
-                    'quantite_product' => '',
-                    'price_product' =>  '',
-                    'img_product' => '',
-                    'name_product_err' => '',
-                    'quantite_product_err' => '',
-                    'price_product_err' => '',
-                    'img_product_err' => '',
+                    'name_product' => trim($_POST['prod_name'][$i]),
+                    'quantite_product' => trim($_POST['quantite'][$i]),
+                    'price_product' =>  trim($_POST['price'][$i]),
+                    'img_product' => $img_name,
+                 
+
                 ];
 
-                $this->view('posts/dashboard', $data);
+                $this->postModel->addProducts($data);
+
             }
+            redirect('posts/dashboard');
+            
         }
     }
 
     public function edit($id)
     {
+
         // Check for POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            $img_name = $_FILES['img']['name'];
-            $img_tmp = $_FILES['img']['tmp_name'];
-            move_uploaded_file($img_tmp, 'img/upload/' . $img_name);
+            $image = $_FILES['img'] ?? false;
+            if ($image) {
+                $img_name = $image['name'];
+                $img_tmp = $image['tmp_name'];
+                move_uploaded_file($img_tmp, 'img/upload/' . $img_name);
+            }
 
             $data = [
                 'id_product' => $id,
@@ -131,9 +98,6 @@ class Posts extends Controller
             }
             if (empty($data['price_product'])) {
                 $data['price_product_err'] = 'Please enter Price';
-            }
-            if (empty($data['img_product'])) {
-                $data['img_product_err'] = 'Please enter Image';
             }
 
             //make sure no errors
@@ -160,7 +124,7 @@ class Posts extends Controller
                     'img_product_err' => '',
                 ];
 
-                $this->view('posts/dashboard', $data);
+            redirect('posts/dashboard');
             }
         }
     }
@@ -227,7 +191,7 @@ class Posts extends Controller
     public function search()
     {
 
-        
+
 
         // Check for POST
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -237,16 +201,18 @@ class Posts extends Controller
             $_POST = filter_input_array(INPUT_POST, 513);
 
             $searchName = trim($_POST['search_name']);
-
-            if ($this->postModel->searchInProducts($searchName)) {
-                $products = $this->postModel->searchInProducts($searchName);
+            $products = $this->postModel->searchInProducts($searchName);
+            $stats = $this->postModel->getStats();
+            
+            if ($products) {
 
                 $data = [
                     'allItems' => $products,
+                    'stats' => $stats
                 ];
                 $this->view('posts/dashboard', $data);
             } else {
-                $this->view('posts/dashboard');
+                redirect('posts/dashboard');
             }
         }
     }

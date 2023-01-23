@@ -11,7 +11,7 @@ class Pages extends Controller
   public function index()
   {
     $data = [
-      'title' => 'Gold Star',
+      'title' => 'CureCo',
     ];
 
     $this->view('pages/index', $data);

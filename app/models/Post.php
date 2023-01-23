@@ -17,17 +17,12 @@ return $results;
 public function  addProducts($data){
 
     
-     $this->db->query('INSERT INTO `items`( `name_product`, `quantite_product`, `price_product`, `img_product`)  VALUES (:name, :quantite, :prix ,:image) , (:name1, :quantite1, :prix1 ,:image1)');
+     $this->db->query('INSERT INTO `items`( `name_product`, `quantite_product`, `price_product`, `img_product`)  VALUES (:name, :quantite, :prix ,:image) ');
         $this->db->bind(":name", $data['name_product']);
         $this->db->bind(":quantite", $data['quantite_product']);
         $this->db->bind(":prix", $data['price_product']);
         $this->db->bind(":image", $data['img_product']);
 
-        $this->db->bind(":name1", $data['name_product1']);
-        $this->db->bind(":quantite1", $data['quantite_product1']);
-        $this->db->bind(":prix1", $data['price_product1']);
-        $this->db->bind(":image1", $data['img_product1']);
-       
 
         if ($this->db->execute()) {
             return true;
@@ -56,12 +51,15 @@ public function deleteProduct($id_product){
    }
 
    public function updateProducts($data){
-    $this->db->query(' UPDATE `items` SET `name_product`= :name,`quantite_product`= :quantite,`price_product`=:prix,`img_product`= :image WHERE `id_product`= :id_product');
+    $image = ($data['img_product']) ? ',`img_product`= :image' : '';
+    $this->db->query(' UPDATE `items` SET `name_product`= :name,`quantite_product`= :quantite,`price_product`=:prix'. $image .' WHERE `id_product`= :id_product');
     $this->db->bind(':id_product', $data['id_product']);
     $this->db->bind(':name', $data['name_product']);
     $this->db->bind(':quantite', $data['quantite_product']);
     $this->db->bind(':prix', $data['price_product']);
-    $this->db->bind(':image', $data['img_product']);
+    if ($data['img_product']) {
+        $this->db->bind(':image', $data['img_product']);
+    }
 
     if ($this->db->execute()) {
         return true;
@@ -100,4 +98,22 @@ public function sortByPriceASC()
             return false;
         }
     }
+    public function getStats(){
+
+        $this->db->query('SELECT * FROM items');
+        $row1=$this->db->resultSet();
+        $stats['tot']=count($row1);
+
+        $this->db->query('SELECT MIN(price_product) as min FROM items');
+        $row2=$this->db->single();
+        $stats['min']=$row2;
+
+        $this->db->query('SELECT MAX(price_product) as max FROM items');
+        $row3=$this->db->single();
+        $stats['max']=$row3;
+
+        return $stats;
+
+    }
+
 }

@@ -2,6 +2,9 @@
 <div class="hero_area">
 
 
+
+
+
   <!-- price section -->
   <section class="price_section layout_padding">
     <div class="container">

@@ -3,11 +3,11 @@
   define('DB_HOST', 'localhost');
   define('DB_USER', 'root');
   define('DB_PASS', '');
-  define('DB_NAME', 'gold_star');
+  define('DB_NAME', 'cureco');
 
   // App Root
   define('APPROOT', dirname(dirname(__FILE__)));
   // URL Root
-  define('URLROOT', 'http://localhost/Breif_5');
+  define('URLROOT', 'http://localhost/cureco');
   // Site Name
-  define('SITENAME', 'gold_star');
+  define('SITENAME', 'cureco');
