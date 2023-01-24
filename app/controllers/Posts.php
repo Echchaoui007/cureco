@@ -164,8 +164,10 @@ class Posts extends Controller
         if ($this->postModel->sortByPriceASC()) {
 
             $products = $this->postModel->sortByPriceASC();
+            $stats = $this->postModel->getStats();
             $data = [
-                'allItems' => $products
+                'allItems' => $products,
+                'stats' => $stats
             ];
 
             $this->view('posts/dashboard', $data);
@@ -178,8 +180,10 @@ class Posts extends Controller
         if ($this->postModel->sortByPriceDESC()) {
 
             $products = $this->postModel->sortByPriceDESC();
+            $stats = $this->postModel->getStats();
             $data = [
-                'allItems' => $products
+                'allItems' => $products,
+                'stats' => $stats
             ];
 
             $this->view('posts/dashboard', $data);
